@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.4.0">
+<eagle version="6.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -7139,9 +7139,9 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="U1" library="TCS3414FN" deviceset="TCS3414FN" device="FN"/>
 <part name="U$1" library="mcu-accessories" deviceset="TEENSY_3.1_BASIC" device=""/>
 <part name="C1" library="resistor" deviceset="C-US" device="C0603" value="0.1uF"/>
-<part name="R1" library="rcl" deviceset="R-US_" device="R0603" value="2k5"/>
-<part name="R2" library="rcl" deviceset="R-US_" device="R0603" value="1k3"/>
-<part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="1k3"/>
+<part name="R1" library="rcl" deviceset="R-US_" device="R0603" value="10k"/>
+<part name="R2" library="rcl" deviceset="R-US_" device="R0603" value="4k7"/>
+<part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="4k7"/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
