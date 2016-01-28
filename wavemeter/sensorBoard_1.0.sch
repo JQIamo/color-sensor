@@ -3492,9 +3492,9 @@ Metric Code Size 5664</description>
 <wire x1="10.16" y1="-10.16" x2="10.16" y2="10.16" width="0.254" layer="94"/>
 <wire x1="10.16" y1="10.16" x2="-10.16" y2="10.16" width="0.254" layer="94"/>
 <pin name="SCLK" x="-15.24" y="7.62" length="middle"/>
-<pin name="DIN" x="-15.24" y="2.54" length="middle"/>
+<pin name="MOSI" x="-15.24" y="2.54" length="middle"/>
 <pin name="VDD" x="-15.24" y="-2.54" length="middle"/>
-<pin name="DOUT" x="-15.24" y="-7.62" length="middle"/>
+<pin name="MISO" x="-15.24" y="-7.62" length="middle"/>
 <pin name="GND" x="15.24" y="7.62" length="middle" rot="R180"/>
 <pin name="SCL" x="15.24" y="2.54" length="middle" rot="R180"/>
 <pin name="SYNC" x="15.24" y="-2.54" length="middle" rot="R180"/>
@@ -3544,9 +3544,9 @@ Metric Code Size 5664</description>
 <devices>
 <device name="VERT" package="MJACK8P8C">
 <connects>
-<connect gate="G$1" pin="DIN" pad="2"/>
-<connect gate="G$1" pin="DOUT" pad="4"/>
 <connect gate="G$1" pin="GND" pad="5"/>
+<connect gate="G$1" pin="MISO" pad="4"/>
+<connect gate="G$1" pin="MOSI" pad="2"/>
 <connect gate="G$1" pin="SCL" pad="6"/>
 <connect gate="G$1" pin="SCLK" pad="1"/>
 <connect gate="G$1" pin="SDA" pad="8"/>
@@ -3734,7 +3734,7 @@ Metric Code Size 5664</description>
 <wire x1="121.92" y1="43.18" x2="121.92" y2="24.638" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="DOUT"/>
 <wire x1="33.02" y1="24.638" x2="121.92" y2="24.638" width="0.1524" layer="91"/>
-<pinref part="J1" gate="G$1" pin="DOUT"/>
+<pinref part="J1" gate="G$1" pin="MISO"/>
 <wire x1="38.1" y1="43.18" x2="33.02" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="43.18" x2="33.02" y2="25.146" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="25.146" x2="33.02" y2="24.892" width="0.1524" layer="91"/>
@@ -3747,7 +3747,7 @@ Metric Code Size 5664</description>
 <wire x1="139.7" y1="22.86" x2="22.86" y2="22.86" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="DIN"/>
 <wire x1="22.86" y1="22.86" x2="22.86" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="J1" gate="G$1" pin="DIN"/>
+<pinref part="J1" gate="G$1" pin="MOSI"/>
 <wire x1="22.86" y1="53.34" x2="38.1" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>

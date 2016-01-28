@@ -78,8 +78,8 @@ size_t addr=0, len;
 void setup()
 {
   pinMode(LED_BUILTIN,OUTPUT);        // LED blink output
-  pinMode(20, OUTPUT);                // set sync pin 20 to output
-  digitalWrite(20, LOW);              // set teensy SYNC pin low 
+  pinMode(17, OUTPUT);                // set sync pin 20 to output
+  digitalWrite(17, LOW);              // set teensy SYNC pin low 
     
   // setup for Master mode, pins 18/19, external pullups, 400kHz
   Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
@@ -102,10 +102,10 @@ void setup()
 
   while(!Serial);                        // wait to start
   
-  digitalWrite(20, HIGH);                 // start ADC integration cycle
+  digitalWrite(17, HIGH);                 // start ADC integration cycle
   slaveTimer.begin(syncInt, INT_TIME);   // start integration timer
   delayMicroseconds(100);                 // minimum pulse width 50us
-  digitalWrite(20, LOW);                  // end pulse
+  digitalWrite(17, LOW);                  // end pulse
 }
 
 
@@ -115,7 +115,7 @@ volatile boolean intVar = 1;
 // sync pin high and setting intVar to 0 so that loop commences
 void syncInt(void) 
 {
-  digitalWrite(20, HIGH);                 // end ADC integration cycle
+  digitalWrite(17, HIGH);                 // end ADC integration cycle
   intVar = 0;
 }
 
@@ -125,17 +125,17 @@ void loop()
 
     slaveTimer.end();
     delayMicroseconds(50);             // minimum pulse width 50 us
-    digitalWrite(20, LOW);              // finish ending pulse
+    digitalWrite(17, LOW);              // finish ending pulse
          
     noInterrupts();
     readSlave();
     intVar = 1;
     interrupts();
 
-    digitalWrite(20, HIGH);                 // start ADC integration cycle
+    digitalWrite(17, HIGH);                 // start ADC integration cycle
     slaveTimer.begin(syncInt, INT_TIME);   // start integration timer
     delayMicroseconds(50);                 // minimum pulse width 50us
-    digitalWrite(20, LOW);                  // end pulse
+    digitalWrite(17, LOW);                  // end pulse
 }
     
 

@@ -84,6 +84,7 @@ void setup()
     // Setup Slave
     Wire.beginTransmission(tcs);        // master addr
     Wire.write(0x80);                   // Command to access control register
+    Serial.printf("test");
     Wire.write(0x03);                   // Powers up the TCS chip
     delay(15);                          // Chip starts 12ms integrations
     Wire.endTransmission();             // blocking Tx
@@ -101,6 +102,7 @@ void setup()
 
 void loop()
 {
+    digitalWrite(LED_BUILTIN,HIGH);         // pulse LED when reading
     readSlave();
     delay(1000);
 }
@@ -109,25 +111,12 @@ void readSlave(void)
 {
     // 8 variables to hold the data 
     // g_low = green channel low byte, etc.
-    int g_low, g_high,                     
-        r_low, r_high,
-        b_low, b_high,
-        c_low, c_high;
-   
-    // variables for total channel values
-    int green, red, blue, clr;
+    int g_low, g_high;                     
+      
+   int green;
         
     digitalWrite(LED_BUILTIN,HIGH);         // pulse LED when reading
 
-    Wire.beginTransmission(tcs);            // slave addr
-    Wire.write(0xB6);                       // command for clear lower data byte
-    Wire.endTransmission(I2C_NOSTOP);       // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);       // request 2 bytes
-    
-    c_low = Wire.readByte();
-    c_high = Wire.readByte()*256;
-    clr = c_low+c_high;
-    
     Wire.beginTransmission(tcs);            // slave addr
     Wire.write(0xB0);                       // command for green lower data byte
     Wire.endTransmission(I2C_NOSTOP);       // blocking Tx, no STOP
@@ -136,35 +125,8 @@ void readSlave(void)
     g_low = Wire.readByte();
     g_high = Wire.readByte()*256;
     green = g_low+g_high;
-
-    Wire.beginTransmission(tcs);            // slave addr
-    Wire.write(0xB2);                       // command for red lower data byte
-    Wire.endTransmission(I2C_NOSTOP);       // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);       // request 2 bytes
-
-    r_low = Wire.readByte();
-    r_high = Wire.readByte()*256;
-    red = r_low+r_high;
-
-    Wire.beginTransmission(tcs);            // slave addr
-    Wire.write(0xB4);                       // command for blue lower data byte
-    Wire.endTransmission(I2C_NOSTOP);       // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);       // request 2 bytes
-
-    b_low = Wire.readByte();
-    b_high = Wire.readByte()*256;
-    blue = b_low+b_high;
-   
-    
-    
-    Serial.printf("Clear channel: %d\n", clr);
+ 
     Serial.printf("Green channel: %d\n", green);
-    Serial.printf("Red channel: %d\n", red);
-    Serial.printf("Blue channel: %d\n", blue);
-    //Serial.printf("Data read from clear channel upper byte: %d\n", Wire.readByte()*256);
     
-   
-    //addr = (addr < 7) ? addr+1 : 0;         // loop reading memory address
-
     digitalWrite(LED_BUILTIN,LOW);
 }

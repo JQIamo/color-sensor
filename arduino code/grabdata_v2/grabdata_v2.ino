@@ -172,8 +172,5 @@ void readSlave(void)
     Serial.printf("Blue channel: %d\n", blue);
     //Serial.printf("Data read from clear channel upper byte: %d\n", Wire.readByte()*256);
     
-   
-    //addr = (addr < 7) ? addr+1 : 0;         // loop reading memory address
-
     digitalWrite(LED_BUILTIN,LOW);
 }
