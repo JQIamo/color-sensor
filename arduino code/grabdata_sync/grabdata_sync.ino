@@ -56,60 +56,59 @@
 #include <i2c_t3.h>
 #include <TimerOne.h>
 
-// Command definitions
+// command definitions
 #define WRITE    0x10
 #define READ     0x20
 #define SETRATE  0x30
 
-// TCS-3414 sensor definition
+// TCS-3414 register addresses 
+#define TCS       0x39
 #define CONTROL   0x80
 #define TIMING    0x81
-#define INT_TIME  150000
+
+// Sync integration constants
+#define INT_TIME  500000
+#define SYNC_PIN 17
 
 // Function prototypes
 void readSlave(void);
 void syncInt(void);
 
 IntervalTimer slaveTimer;
-uint8_t tcs=0x39;
 size_t addr=0, len;
-
+volatile boolean intVar = 1;
 
 void setup()
 {
-  pinMode(LED_BUILTIN,OUTPUT);        // LED blink output
-  pinMode(17, OUTPUT);                // set sync pin 20 to output
-  digitalWrite(17, LOW);              // set teensy SYNC pin low 
+  pinMode(LED_BUILTIN,OUTPUT);            // LED blink output
+  pinMode(SYNC_PIN, OUTPUT);              // set sync pin 20 to output
+  digitalWrite(SYNC_PIN, LOW);            // set teensy SYNC pin low (rising edge signals to start integration)
     
   // setup for Master mode, pins 18/19, external pullups, 400kHz
   Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
-    
   // setup for Slave mode (sensor), TCS address, pins 18/19, external pullups, 400kHz
-  Wire.begin(I2C_SLAVE, tcs, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+  Wire.begin(I2C_SLAVE, TCS, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
     
   Serial.begin(115200);
-  delay(5);                           // slave powerup wait
+  delay(10);                              
 
-  Wire.beginTransmission(tcs);        // slave addr
-  Wire.write(CONTROL);                // access control register
-  Wire.write(0x03);                   // powers up TCS chip / enable ADC
-  Wire.endTransmission();             // blocking Tx
+  Wire.beginTransmission(TCS);           
+  Wire.write(CONTROL);                    // access control register
+  Wire.write(0x03);                       // powers up TCS chip / enable ADC
+  Wire.endTransmission();            
 
-  Wire.beginTransmission(tcs);        // talk to slave
-  Wire.write(TIMING);                 // access timing register
-  Wire.write(0x70);                   // sync integration over rising edge
-  Wire.endTransmission();             // blocking Tx
+  Wire.beginTransmission(TCS);            
+  Wire.write(TIMING);                     // access timing register
+  Wire.write(0x70);                       // sync integration over rising edge
+  Wire.endTransmission();              
 
-  while(!Serial);                        // wait to start
+  while(!Serial);                         // wait to start
   
   digitalWrite(17, HIGH);                 // start ADC integration cycle
-  slaveTimer.begin(syncInt, INT_TIME);   // start integration timer
+  slaveTimer.begin(syncInt, INT_TIME);    // start integration timer
   delayMicroseconds(100);                 // minimum pulse width 50us
   digitalWrite(17, LOW);                  // end pulse
 }
-
-
-volatile boolean intVar = 1;
 
 // sync interrupt function - ends the integration cycle by pulling the 
 // sync pin high and setting intVar to 0 so that loop commences
@@ -124,7 +123,7 @@ void loop()
     while(intVar == 1);                 // wait until ADC integration cycle finishes
 
     slaveTimer.end();
-    delayMicroseconds(50);             // minimum pulse width 50 us
+    delayMicroseconds(100);             // minimum pulse width 50 us
     digitalWrite(17, LOW);              // finish ending pulse
          
     noInterrupts();
@@ -133,8 +132,8 @@ void loop()
     interrupts();
 
     digitalWrite(17, HIGH);                 // start ADC integration cycle
-    slaveTimer.begin(syncInt, INT_TIME);   // start integration timer
-    delayMicroseconds(50);                 // minimum pulse width 50us
+    slaveTimer.begin(syncInt, INT_TIME);    // start integration timer
+    delayMicroseconds(100);                 // minimum pulse width 50us
     digitalWrite(17, LOW);                  // end pulse
 }
     
@@ -152,40 +151,40 @@ void readSlave(void)
     digitalWrite(LED_BUILTIN,HIGH);     // pulse LED when reading
 
     // diable ADC integration
-    Wire.beginTransmission(tcs);        // talk to slave
+    Wire.beginTransmission(TCS);        // talk to slave
     Wire.write(CONTROL);                // access control register
     Wire.write(0x01);                   // disable ADC integration (toggle)
     Wire.endTransmission();             // blocking Tx
       
     // read values
-    Wire.beginTransmission(tcs);        // talk to slave
+    Wire.beginTransmission(TCS);        // talk to slave
     Wire.write(0xB6);                   // command for clear lower data byte
     Wire.endTransmission(I2C_NOSTOP);   // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);   // request 2 bytes
+    Wire.requestFrom(TCS,2,I2C_STOP);   // request 2 bytes
     c_low = Wire.readByte();
     c_high = Wire.readByte();
     clr = c_low+c_high*256;
     
-    Wire.beginTransmission(tcs);        // talk to slave
+    Wire.beginTransmission(TCS);        // talk to slave
     Wire.write(0xB0);                   // access lower green data byte
     Wire.endTransmission(I2C_NOSTOP);   // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);   // request 2 bytes
+    Wire.requestFrom(TCS,2,I2C_STOP);   // request 2 bytes
     g_low = Wire.readByte();
     g_high = Wire.readByte();
     green = g_low+g_high*256;
 
-    Wire.beginTransmission(tcs);        // talk to slave
+    Wire.beginTransmission(TCS);        // talk to slave
     Wire.write(0xB2);                   // access lower red data byte
     Wire.endTransmission(I2C_NOSTOP);   // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);   // request 2 bytes
+    Wire.requestFrom(TCS,2,I2C_STOP);   // request 2 bytes
     r_low = Wire.readByte();
     r_high = Wire.readByte();
     red = r_low+r_high*256;
 
-    Wire.beginTransmission(tcs);        // talk to slave
+    Wire.beginTransmission(TCS);        // talk to slave
     Wire.write(0xB4);                   // access lower blue data byte
     Wire.endTransmission(I2C_NOSTOP);   // blocking Tx, no STOP
-    Wire.requestFrom(tcs,2,I2C_STOP);    // request 2 bytes
+    Wire.requestFrom(TCS,2,I2C_STOP);    // request 2 bytes
     b_low = Wire.readByte();
     b_high = Wire.readByte();
     blue = b_low+b_high*256;
@@ -196,10 +195,8 @@ void readSlave(void)
     digitalWrite(LED_BUILTIN,LOW);
     
     // enable ADC integration
-    Wire.beginTransmission(tcs);        // talk to slave
+    Wire.beginTransmission(TCS);        
     Wire.write(CONTROL);                // access control register
     Wire.write(0x03);                   // enable ADC integration
-    Wire.endTransmission();             // blocking Tx      
-
-    delayMicroseconds(100);             
+    Wire.endTransmission();                              
 }
